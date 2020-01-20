@@ -5,15 +5,20 @@ Created on Thu Jan 16 11:01:53 2020
 """
 
 import datetime as dt
-import random as rnd
 import pandas as pd
 import numpy as np
 
 # number of iterations
 simnum = 1000
 
+#input file
+csvname = 'fdata.csv'
+
 # initialize df for results
 simdf = pd.DataFrame(columns = ['iter', 'id', 'lastf'])
+
+# print start time
+print(dt.datetime.now())
 
 for ii in range(simnum):
     
@@ -24,10 +29,13 @@ for ii in range(simnum):
     simend = dt.datetime(2030, 12, 31, 23, 59, 59)
     
     # dummy dataframe
-    eventdf = pd.DataFrame([[101, dt.datetime(2018, 10, 31, 0, 0, 0), 0.0], 
+    eventdf = pd.read_csv('input/' + csvname, sep=',', parse_dates=['lastf'])
+    eventdf['rndunrel'] = 0.0
+    """
+        pd.DataFrame([[101, dt.datetime(2018, 10, 31, 0, 0, 0), 0.0], 
                             [102, dt.datetime(2018, 11, 11, 0, 0, 0), 0.0]],
                             columns = ['id', 'lastf', 'rndunrel'])
-
+    """
     # wb parameters
     beta, eta = 2.0, 1000
 
@@ -57,5 +65,13 @@ for ii in range(simnum):
         simdf = simdf.append(eventdf[eventdf.lastf < simend][['id', 'lastf']], ignore_index=True, sort=False)
         simdf.iter.fillna(value=ii, inplace=True)
 
+
 # print results      
-print(simdf)
+# print(simdf)
+
+# save results
+csvname = 'output/' + csvname.replace('.csv', '') + str(dt.datetime.now()).replace(':', '.') + '.csv'
+simdf.to_csv(path_or_buf=csvname, sep=',', columns=['iter', 'id', 'lastf'])
+
+# print end time
+print(dt.datetime.now())        
